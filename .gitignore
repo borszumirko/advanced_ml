@@ -1,0 +1,62 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.jmx
+*.idea/
+
+# Logs
+logs/
+*.log
+*.tlog
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.iml
+
+# General backups and temp files
+*.swp
+*.swo
+*.tmp
+*.bak
+*.orig
+
+# Compiled binary files
+*.exe
+*.dll
+*.out
+*.o
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git-specific files
+.git/
+
+# Venv
+adv_ml/
