@@ -40,17 +40,11 @@ def create_test_labels():
     return labels
 
 
-def plot_datapoint(data):
-    
+def plot_datapoint(data):  
     plt.figure(figsize=(10, 6))
 
     for i in range(12):
-        plt.plot(data[i], label=f'Line {i+1}')
-
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('12 Lines Plot')
-    plt.legend()
+        plt.plot(data[i])
+    plt.xlim(1, 30)
     plt.grid(True)
-    # Show the plot
     plt.show()
