@@ -8,7 +8,7 @@ def read_blocks(filepath):
     block = [[] for _ in range(12)]
     for row in ae_data:
         if np.array_equal(row, np.ones(12)):
-            inputs.append(np.array(block))
+            inputs.append(np.array(block).T)
             block = [[] for _ in range(12)]
             continue
 
