@@ -78,6 +78,7 @@ def perform_baseline_model():
 
     best_k, best_score = best_performer(final_scores)
 
+    # Train the best model on the test set
     best_knn = KNeighborsClassifier(n_neighbors=best_k)
     best_knn.fit(train_features, train_labels_int)
 
