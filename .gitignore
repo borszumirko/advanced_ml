@@ -60,3 +60,7 @@ desktop.ini
 
 # Venv
 adv_ml/
+
+notebook.ipynb
+
+figures/

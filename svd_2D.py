@@ -1,6 +1,4 @@
 from preprocessing import preprocess_data
-from baseline_model import perform_baseline_model
-from read_data import read_data, plot_datapoint
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from functools import partial

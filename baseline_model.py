@@ -86,6 +86,6 @@ def perform_baseline_model():
     test_features = scaler.transform(test_feature_matrix)
 
     test_score = best_knn.score(test_features, test_labels_int)
-    print(f'Best k: {best_k}, Validation score: {best_score}, Test score: {test_score}')
-    
+    # print(f'Best k: {best_k}, Validation score: {best_score}, Test score: {test_score}')
+
     return best_k, best_score, test_score

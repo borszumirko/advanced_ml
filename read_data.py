@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 def read_blocks(filepath):
     ae_data = np.loadtxt(filepath)
@@ -38,13 +37,3 @@ def create_test_labels():
             label[idx] = 1
             labels.append(label)
     return labels
-
-
-def plot_datapoint(data):  
-    plt.figure(figsize=(10, 6))
-
-    for i in range(12):
-        plt.plot(data[i])
-    plt.xlim(1, 30)
-    plt.grid(True)
-    plt.show()
