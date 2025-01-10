@@ -1,11 +1,11 @@
-from read_data import read_data, plot_datapoint
+from baseline_model import perform_baseline_model
+from svd_2D import run_2dsvd
 import numpy as np
 
 
 def main():
-    train_inputs, test_inputs, train_labels, test_labels = read_data()
-
-    plot_datapoint(train_inputs[0])
+    # perform_baseline_model()
+    run_2dsvd()
     
     
 

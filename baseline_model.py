@@ -67,7 +67,7 @@ def perform_baseline_model():
         for train_index, val_index in kf.split(train_features, train_labels_int):
             X_train, X_val = train_features[train_index], train_features[val_index]
             y_train, y_val = train_labels_int[train_index], train_labels_int[val_index]
-            
+
             knn = KNeighborsClassifier(n_neighbors=k)
             knn.fit(X_train, y_train)
             score = knn.score(X_val, y_val)
@@ -87,5 +87,5 @@ def perform_baseline_model():
 
     test_score = best_knn.score(test_features, test_labels_int)
     print(f'Best k: {best_k}, Validation score: {best_score}, Test score: {test_score}')
-
+    
     return best_k, best_score, test_score
