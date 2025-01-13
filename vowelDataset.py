@@ -12,13 +12,14 @@ class VowelDataset:
     def __getitem__(self, idx):
         # shape is (30, 12)
         x_tensor = torch.tensor(self.data[idx], dtype=torch.float32)
-        
         # Transpose to (12, 30)
-        # x_tensor = x_tensor.transpose(0, 1)
-        
+        x_tensor = x_tensor.transpose(0, 1)
+
+        # Convert one-hot label to single integer
         y_tensor = torch.tensor(self.labels[idx], dtype=torch.float32)
-        
-        return x_tensor, y_tensor
+        y_int = torch.argmax(y_tensor).long()
+
+        return x_tensor, y_int
 
 
 def pad_sequences(sequences, max_len=30):

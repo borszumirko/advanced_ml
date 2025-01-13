@@ -42,7 +42,7 @@ class CustomCNN(nn.Module):
         logits = self.fc(x)   
         return logits
 
-def train_model(model, train_loader, test_loader, num_epochs=30, lr=1e-3):
+def train_model(model, train_loader, num_epochs=30, lr=1e-3):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
     

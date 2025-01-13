@@ -36,7 +36,7 @@ def main():
     test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
     model = CustomCNN(num_classes=9)
-    # train_model(model, train_loader, test_loader, num_epochs=30, lr=1e-3)
+    train_model(model, train_loader, num_epochs=30, lr=1e-3)
 
     # test_acc = evaluate_model(model, test_loader, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
     # print(f"Final Test Accuracy: {test_acc:.2f}%")
