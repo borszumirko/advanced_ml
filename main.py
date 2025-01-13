@@ -1,7 +1,7 @@
 from baseline_model import perform_baseline_model
 from svd_2D import run_2dsvd
 from read_data import read_data
-from plotting import plot_datapoint, plot_multiple_datapoints
+from plotting import plot_datapoint, plot_multiple_datapoints, heatmap_plot, plot_loss_accuracy, activations_plot
 from custom_cnn_model import CustomCNN, train_model, evaluate_model
 from vowelDataset import VowelDataset, pad_sequences
 from torch.utils.data import Dataset, DataLoader
@@ -36,11 +36,16 @@ def main():
     test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
     model = CustomCNN(num_classes=9)
-    train_model(model, train_loader, num_epochs=30, lr=1e-3)
+    loss_scores, acc_scores = train_model(model, train_loader, num_epochs=30, lr=1e-4)
 
-    # test_acc = evaluate_model(model, test_loader, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
-    # print(f"Final Test Accuracy: {test_acc:.2f}%")
-    
+    test_acc = evaluate_model(model, test_loader, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+    print(f"Final Test Accuracy: {test_acc:.2f}%")
+
+    heatmap_plot(model, test_loader)
+
+    plot_loss_accuracy(loss_scores, acc_scores)
+
+    activations_plot(model, test_loader)
 
 if __name__ == "__main__":
     main()
