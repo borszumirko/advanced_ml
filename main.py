@@ -1,10 +1,12 @@
 from baseline_model import perform_baseline_model
-from svd_2D import run_2dsvd
+from svd_2D import run_2dsvd, best_params_2dsvd
 from read_data import read_data
 from plotting import plot_datapoint, plot_multiple_datapoints, heatmap_plot, plot_loss_accuracy, activations_plot
 from custom_cnn_model import CustomCNN, train_model, evaluate_model
 from vowelDataset import VowelDataset, pad_sequences
 from torch.utils.data import Dataset, DataLoader
+from preprocessing import preprocess_data
+from svd_2d_CNN import CNNForSVD, train_CNN
 import torch
 import numpy as np
 
@@ -17,17 +19,19 @@ def main():
 
     ## Perform the baseline model
     best_k, best_score, test_score = perform_baseline_model()
-    print("Baseline model(kMM): ")
+    print("Baseline model(kNN): ")
     print(f'Best k: {best_k}, Validation score: {best_score}, Test score: {test_score}')
 
     ## Perform SVD model
-    run_2dsvd()
+    # run_2dsvd()
 
     ## Perform custom CNN model
     X_train = pad_sequences(train_inputs, max_len=30)
     y_train = np.array(train_labels)                 
     X_test = pad_sequences(test_inputs, max_len=30)    
     y_test = np.array(test_labels)                   
+
+    # X_train, X_test = preprocess_data(train_inputs, test_inputs, 5, 10)
 
     train_dataset = VowelDataset(X_train, y_train)
     test_dataset = VowelDataset(X_test, y_test)
@@ -36,6 +40,7 @@ def main():
     test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
     model = CustomCNN(num_classes=9)
+    # model = CNNForSVD()
     loss_scores, acc_scores = train_model(model, train_loader, num_epochs=30, lr=1e-4)
 
     test_acc = evaluate_model(model, test_loader, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
@@ -47,5 +52,13 @@ def main():
 
     activations_plot(model, test_loader)
 
+def experiment():
+    # max_acc, best_k, best_row_ev, best_col_ev = run_2dsvd()
+    # print(f"best val acc: {max_acc}, best_k: {best_k}, best_row_ev: {best_row_ev}, best_col_ev: {best_col_ev}")
+    # best val acc: 0.9666666666666668, best_k: 3, best_row_ev: 5, best_col_ev: 10
+    # best_params_2dsvd(3, 5, 10)
+    train_CNN(CNNForSVD)
+
 if __name__ == "__main__":
     main()
+    #experiment()

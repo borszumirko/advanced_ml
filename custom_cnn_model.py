@@ -51,12 +51,12 @@ def get_activation(name):
     return hook
 
 
-def train_model(model, train_loader, num_epochs=30, lr=1e-3):
+def train_model(model, train_loader, num_epochs=30, lr=1e-3, weight_decay=1e-4):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
     
     # Define optimizer and loss
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     criterion = nn.CrossEntropyLoss()
 
     loss_scores = []
@@ -94,9 +94,9 @@ def train_model(model, train_loader, num_epochs=30, lr=1e-3):
         loss_scores.append(epoch_loss)
         acc_scores.append(epoch_acc)
         
-        print(f"Epoch [{epoch+1}/{num_epochs}] - "
-              f"Train Loss: {epoch_loss:.4f} | "
-              f"Train Acc: {epoch_acc:.2f}%")
+        # print(f"Epoch [{epoch+1}/{num_epochs}] - "
+        #       f"Train Loss: {epoch_loss:.4f} | "
+        #       f"Train Acc: {epoch_acc:.2f}%")
     
     return loss_scores, acc_scores
 
@@ -153,4 +153,4 @@ def register_activations(model, test_loader):
     conv2_act = activations['conv2']  # shape: (1, 64, 30)
     return conv1_act, conv2_act
 
-def get_activations()
+# def get_activations()
