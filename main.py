@@ -6,7 +6,7 @@ from custom_cnn_model import CustomCNN, train_model, evaluate_model
 from vowelDataset import VowelDataset, pad_sequences
 from torch.utils.data import Dataset, DataLoader
 from preprocessing import preprocess_data
-from svd_2d_CNN import CNNForSVD, train_CNN
+from svd_2d_CNN import train_CNN
 import torch
 import numpy as np
 
@@ -39,26 +39,28 @@ def main():
     train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
-    model = CustomCNN(num_classes=9)
+    model = CustomCNN(num_classes=9, input_channels=12, input_seq_length=30)
     # model = CNNForSVD()
     loss_scores, acc_scores = train_model(model, train_loader, num_epochs=30, lr=1e-4)
 
     test_acc = evaluate_model(model, test_loader, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
     print(f"Final Test Accuracy: {test_acc:.2f}%")
 
-    heatmap_plot(model, test_loader)
+    # heatmap_plot(model, test_loader)
 
-    plot_loss_accuracy(loss_scores, acc_scores)
+    # plot_loss_accuracy(loss_scores, acc_scores)
 
-    activations_plot(model, test_loader)
+    # activations_plot(model, test_loader)
 
 def experiment():
     # max_acc, best_k, best_row_ev, best_col_ev = run_2dsvd()
     # print(f"best val acc: {max_acc}, best_k: {best_k}, best_row_ev: {best_row_ev}, best_col_ev: {best_col_ev}")
     # best val acc: 0.9666666666666668, best_k: 3, best_row_ev: 5, best_col_ev: 10
     # best_params_2dsvd(3, 5, 10)
-    train_CNN(CNNForSVD)
+    # Best Validation Accuracy: 98.52%, lr: 0.001, wd: 0.001
+    # Final Test Accuracy: 97.30%
+    train_CNN(CustomCNN)
 
 if __name__ == "__main__":
     main()
-    #experiment()
+    experiment()

@@ -10,11 +10,11 @@ import torch.nn.functional as F
 activations = {}
 
 class CustomCNN(nn.Module):
-    def __init__(self, num_classes=9):
+    def __init__(self, input_channels, input_seq_length, num_classes=9):
         super(CustomCNN, self).__init__()
         
         self.conv1 = nn.Conv1d(
-            in_channels=12, 
+            in_channels=input_channels, 
             out_channels=32,
             kernel_size=3,
             padding=1
@@ -29,11 +29,11 @@ class CustomCNN(nn.Module):
         )
         self.bn2 = nn.BatchNorm1d(64)
     
-        self.fc = nn.Linear(64 * 30, num_classes)
+        self.fc = nn.Linear(64 * input_seq_length, num_classes)
     
     def forward(self, x):
         """
-        x shape: (batch_size, 12, 30)
+        x shape: (batch_size, input_channels, input_seq_length)
         """
         x = F.relu(self.bn1(self.conv1(x)))  
         x = F.relu(self.bn2(self.conv2(x))) 

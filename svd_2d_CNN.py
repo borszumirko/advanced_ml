@@ -10,43 +10,6 @@ from custom_cnn_model import train_model, evaluate_model
 from sklearn.model_selection import StratifiedKFold
 from itertools import product
 
-class CNNForSVD(nn.Module):
-    def __init__(self, num_classes=9):
-        super(CNNForSVD, self).__init__()
-        
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=(3, 3), padding=1)
-        self.bn1 = nn.BatchNorm2d(16)
-        
-        self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(3, 3), padding=1)
-        self.bn2 = nn.BatchNorm2d(32)
-        
-        # Fully connected layer for classification
-        self.fc = nn.Linear(32 * 5 * 10, num_classes)
-
-    def forward(self, x):
-        # Input shape: (batch_size, 5, 10)
-        x = x.unsqueeze(1)
-        # Output shape: (batch_size, 1, 5, 10)
-        
-        x = self.conv1(x)  
-        x = self.bn1(x)
-        x = F.relu(x)
-        # Output shape: (batch_size, 16, 5, 10)
-
-        x = self.conv2(x)  
-        x = self.bn2(x)
-        x = F.relu(x)
-        # Output shape: (batch_size, 32, 5, 10)
-
-        # Flatten the output for the fully connected layer
-        x = x.view(x.size(0), -1)  
-        # Output shape: (batch_size, 32 * 5 * 10)
-
-        x = self.fc(x)
-        # Output shape: (batch_size, num_classes)
-        return x
-
-
 
 def run_cross_validation(train_inputs, train_labels, model):
     learning_rates = [1e-4, 5e-4, 1e-3, 5e-3, 1e-2]
@@ -99,7 +62,7 @@ def train_CNN(CNNModel):
     train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
-    model = CNNModel()
+    model = CNNModel(num_classes=9, input_channels=10, input_seq_length=5)
 
     max_acc, lr, wd = run_cross_validation(train_inputs, y_train, model)
     print(f"Best Validation Accuracy: {max_acc:.2f}%, lr: {lr}, wd: {wd}")
