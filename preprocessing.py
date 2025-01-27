@@ -74,3 +74,47 @@ def preprocess_data(train_inputs, test_inputs, num_row_evs, num_col_evs):
     test_inputs_tranformed = np.array([row_eigenvectors.T @ original @ col_eigenvectors for original in test_extended])
 
     return train_inputs_tranformed, test_inputs_tranformed
+
+'''
+Split preprocess into two parts to compute number of eigenvectors in the middle
+'''
+def preprocess_part1(train_inputs, test_inputs):
+    train_extended, test_extended, max_train_length = unify_lengths(train_inputs, test_inputs)
+
+    row_cov, col_cov = create_covariance_matrices(train_extended, max_train_length)
+
+    return train_extended, test_extended, row_cov, col_cov, max_train_length
+
+
+'''
+This returns the number of vectors that explains the threshold variance, it is 98% in the paper.
+'''
+def compute_eigenvectors(covariance_matrix, threshold=0.98):
+
+    eigenvalues, _ = np.linalg.eigh(covariance_matrix)
+
+    eigenvalues = sorted(eigenvalues, reverse=True)
+    total_variance = sum(eigenvalues)
+    explained_variance = 0
+    count = 0
+    for eigenvalue in eigenvalues:
+        explained_variance += eigenvalue
+        count += 1
+        if explained_variance / total_variance >= threshold:
+            break
+
+    return count
+
+
+def preprocess_part2(train_extended, test_extended, row_cov, col_cov, num_row_evs, num_col_evs):
+    row_eigenvectors = get_eigenvectors(row_cov, num_row_evs)
+    col_eigenvectors = get_eigenvectors(col_cov, num_col_evs)
+
+    train_inputs_transformed = np.array([
+        row_eigenvectors.T @ original @ col_eigenvectors for original in train_extended
+    ])
+    test_inputs_transformed = np.array([
+        row_eigenvectors.T @ original @ col_eigenvectors for original in test_extended
+    ])
+
+    return train_inputs_transformed, test_inputs_transformed

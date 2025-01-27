@@ -21,7 +21,7 @@ def main():
     print(f'Best k: {best_k}, Validation score: {best_score}, Test score: {test_score}')
 
     ## Perform SVD model
-    run_2dsvd()
+    run_2dsvd(best_k)
 
     ## Perform custom CNN model
     X_train = pad_sequences(train_inputs, max_len=30)

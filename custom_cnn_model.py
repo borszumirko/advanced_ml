@@ -153,4 +153,4 @@ def register_activations(model, test_loader):
     conv2_act = activations['conv2']  # shape: (1, 64, 30)
     return conv1_act, conv2_act
 
-def get_activations()
+#def get_activations()
