@@ -17,12 +17,20 @@ def sum_squared_differences(X, Y, num_row_evs=3, num_col_evs=9):
         sum += dist
     return sum
 
+def find_best_params(cv_stats):
+    max_acc = 0
+    best_k = None
+    best_row_ev = None
+    best_col_ev = None
 
-def calculate_sse(data, num_row_evs, num_col_evs):
-    total_sse = 0
-    for X, Y in zip(data[:-1], data[1:]):
-        total_sse += sum_squared_differences(X, Y, num_row_evs=num_row_evs, num_col_evs=num_col_evs)
-    return total_sse
+    for dict in cv_stats:
+        if dict['acc'] > max_acc:
+            max_acc = dict['acc']
+            best_k = dict['k']
+            best_row_ev = dict['row_evs']
+            best_col_ev = dict['col_evs']
+
+    return max_acc, best_k, best_row_ev, best_col_ev
 
 '''
 Tuning the number of row (r) and column (s) eigenvectors according to paper.
@@ -38,7 +46,7 @@ def run_2dsvd(best_baseline_k = 3):
     print(f'max2:{max2_col_evs}')
     kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-    k = best_baseline_k #using the best k of the baseline knn
+    k = best_baseline_k  # using the best k of the baseline knn
 
     row_evs_scores = []
     col_evs_scores = []
@@ -47,14 +55,10 @@ def run_2dsvd(best_baseline_k = 3):
     best_s = None
     best_s_score = 0
     train_extended, test_extended, row_cov, col_cov, max_train_length = preprocess_part1(train_inputs, test_inputs)
-
-
-    #r = compute_eigenvectors(col_cov) #number of row eigenvectors
-    #s = compute_eigenvectors(row_cov) #number of column eigenvectors
+    cv_stats = []
 
     for row_evs in range(1, max_train_length):
         r_scores = []
-        #sum_squared_differences_partial = partial(sum_squared_differences, num_row_evs=row_evs, num_col_evs=s)
 
         for train_index, val_index in kf.split(train_inputs, train_labels_int):
             y_train, y_val = train_labels_int[train_index], train_labels_int[val_index]
@@ -64,16 +68,12 @@ def run_2dsvd(best_baseline_k = 3):
 
             train_extended, test_extended, row_cov, col_cov, max_train_length = preprocess_part1(X_train, X_val)
             s = compute_eigenvectors(row_cov)  # number of column eigenvectors
-            X_train_transformed, X_val_transformed = preprocess_part2(train_extended, test_extended, row_cov, col_cov, row_evs, s)
+            X_train_transformed, X_val_transformed = preprocess_part2(train_extended, test_extended, row_cov, col_cov,
+                                                                      row_evs, s)
 
             X_train_flattened = np.array([np.array(matrix.flatten()) for matrix in X_train_transformed])
             X_val_flattened = np.array([np.array(matrix.flatten()) for matrix in X_val_transformed])
 
-            #print(f"X_train_flattened.shape: {X_train_flattened.shape}, y_train.shape: {y_train.shape}")
-            #print(f"X_val_flattened.shape: {X_val_flattened.shape}, y_val.shape: {y_val.shape}")
-
-            #if len(X_train_flattened) != row_evs * s or len(y_train) != row_evs * s:
-             #   break
             sum_squared_differences_partial = partial(sum_squared_differences, num_row_evs=row_evs, num_col_evs=s)
             knn = KNeighborsClassifier(n_neighbors=k, metric=sum_squared_differences_partial)
             knn.fit(X_train_flattened, y_train)
@@ -83,17 +83,15 @@ def run_2dsvd(best_baseline_k = 3):
         print(f'Average val accuracy: {np.mean(r_scores)}, k={k}, row_evs={row_evs}, col_evs={s}')
         if r_scores:
             row_evs_scores.append((row_evs, np.mean(r_scores)))
+            cv_stats.append({'acc': np.mean(r_scores), 'k': k, 'row_evs': row_evs, 'col_evs': s})
             if np.mean(r_scores) > best_r_score:
                 best_r = row_evs
                 best_r_score = np.mean(r_scores)
 
-    for col_evs in range(1, max1_col_evs+1):
-
+    for col_evs in range(1, max1_col_evs + 1):
         s_scores = []
-        #sum_squared_differences_partial = partial(sum_squared_differences, num_row_evs=r, num_col_evs=col_evs)
 
         for train_index, val_index in kf.split(train_inputs, train_labels_int):
-
             y_train, y_val = train_labels_int[train_index], train_labels_int[val_index]
 
             X_train = [train_inputs[i] for i in train_index]
@@ -101,16 +99,11 @@ def run_2dsvd(best_baseline_k = 3):
 
             train_extended, test_extended, row_cov, col_cov, max_train_length = preprocess_part1(X_train, X_val)
             r = compute_eigenvectors(col_cov)  # number of row eigenvectors
-            X_train_transformed, X_val_transformed = preprocess_part2(train_extended, test_extended, row_cov, col_cov, r, col_evs)
+            X_train_transformed, X_val_transformed = preprocess_part2(train_extended, test_extended, row_cov, col_cov,
+                                                                      r, col_evs)
 
             X_train_flattened = np.array([np.array(matrix.flatten()) for matrix in X_train_transformed])
             X_val_flattened = np.array([np.array(matrix.flatten()) for matrix in X_val_transformed])
-
-            #print(f"X_train_flattened.shape: {X_train_flattened.shape}, y_train.shape: {y_train.shape}")
-            #print(f"X_val_flattened.shape: {X_val_flattened.shape}, y_val.shape: {y_val.shape}")
-
-            #if len(X_train_flattened) != r * col_evs or len(y_train) != r * col_evs:
-            #    break
 
             sum_squared_differences_partial = partial(sum_squared_differences, num_row_evs=r, num_col_evs=col_evs)
             knn = KNeighborsClassifier(n_neighbors=k, metric=sum_squared_differences_partial)
@@ -121,6 +114,7 @@ def run_2dsvd(best_baseline_k = 3):
         print(f'Average val accuracy: {np.mean(s_scores)}, k={k}, row_evs={r}, col_evs={col_evs}')
         if s_scores:
             col_evs_scores.append((col_evs, np.mean(s_scores)))
+            cv_stats.append({'acc': np.mean(s_scores), 'k': k, 'row_evs': r, 'col_evs': col_evs})
             if np.mean(s_scores) > best_s_score:
                 best_s = col_evs
                 best_s_score = np.mean(s_scores)
@@ -128,6 +122,9 @@ def run_2dsvd(best_baseline_k = 3):
     print(f'Best r: {best_r} with accuracy: {best_r_score}')
     print(f'Best s: {best_s} with accuracy: {best_s_score}')
 
+    return find_best_params(cv_stats)
+
+'''For plotting
     matplotlib.use('TkAgg')
 
     if row_evs_scores:
@@ -149,3 +146,23 @@ def run_2dsvd(best_baseline_k = 3):
         plt.legend()
         plt.savefig("figures/col_eigenvectors_vs_accuracy.png")
         plt.show()
+'''
+
+def best_params_2dsvd(k, row_evs, col_evs):
+    train_inputs, test_inputs, train_labels, test_labels = read_data()
+    train_labels_int = np.argmax(train_labels, axis=1)
+    test_labels_int  = np.argmax(test_labels, axis=1)
+
+    sum_squared_differences_partial = partial(sum_squared_differences, num_row_evs=row_evs, num_col_evs=col_evs)
+
+    # (270, 5, 10)       (370, 5, 10)
+    X_train_transformed, X_test_transformed = preprocess_data(train_inputs, test_inputs, row_evs, col_evs)
+
+
+    X_train_flattened = np.array([np.array(matrix.flatten()) for matrix in X_train_transformed])
+    X_test_flattened = np.array([np.array(matrix.flatten()) for matrix in X_test_transformed])
+
+    knn = KNeighborsClassifier(n_neighbors=k, metric=sum_squared_differences_partial)
+    knn.fit(X_train_flattened, train_labels_int)
+    score = knn.score(X_test_flattened, test_labels_int)
+    print(f'Test accuracy: {score}, k={k}, row_evs={row_evs}, col_evs={col_evs}')

@@ -63,10 +63,10 @@ def get_eigenvectors(cov_matrix, n_evs):
     
     return top_eigenvectors
     
-def preprocess_data(train_inputs, test_inputs, num_row_evs, num_col_evs):
+def preprocess_data(train_inputs, test_inputs, num_row_evs=5, num_col_evs=10):
     train_extended, test_extended, max_train_length = unify_lengths(train_inputs, test_inputs)
     row_cov, col_cov = create_covariance_matrices(train_extended, max_train_length)
-
+    
     row_eigenvectors = get_eigenvectors(row_cov, num_row_evs)
     col_eigenvectors = get_eigenvectors(col_cov, num_col_evs)
    
