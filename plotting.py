@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('Agg')  # For non-interactive plots
+# matplotlib.use('Agg')  # For non-interactive plots
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix

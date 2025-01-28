@@ -3,7 +3,9 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from functools import partial
 from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, ConfusionMatrixDisplay
 from read_data import read_data
+import matplotlib.pyplot as plt
 
 def sum_squared_differences(X, Y, num_row_evs=3, num_col_evs=9):
     sum = 0
@@ -60,9 +62,14 @@ def run_2dsvd():
                     knn = KNeighborsClassifier(n_neighbors=k, metric=sum_squared_differences_partial)
                     knn.fit(X_train_flattened, y_train)
                 
-                    score = knn.score(X_val_flattened, y_val)
-                    scores.append(score)
-                print(f'Average val accuracy: {np.mean(scores)}, k={k}, row_evs={row_evs}, col_evs={col_evs}')
+                    # score = knn.score(X_val_flattened, y_val)
+                    # scores.append(score)
+                    
+                    predictions = knn.predict(X_val_flattened)
+                    f1 = f1_score(y_val, predictions, average="weighted")
+                    scores.append(f1)
+
+                print(f'Average val f1: {np.mean(scores)}, k={k}, row_evs={row_evs}, col_evs={col_evs}')
                 cv_stats.append({'acc': np.mean(scores), 'k': k, 'row_evs': row_evs, 'col_evs': col_evs})
     
     return find_best_params(cv_stats)
@@ -83,6 +90,20 @@ def best_params_2dsvd(k, row_evs, col_evs):
     X_test_flattened = np.array([np.array(matrix.flatten()) for matrix in X_test_transformed])
                     
     knn = KNeighborsClassifier(n_neighbors=k, metric=sum_squared_differences_partial)
-    knn.fit(X_train_flattened, train_labels_int) 
-    score = knn.score(X_test_flattened, test_labels_int)
-    print(f'Test accuracy: {score}, k={k}, row_evs={row_evs}, col_evs={col_evs}')
+    knn.fit(X_train_flattened, train_labels_int)
+
+    predictions = knn.predict(X_test_flattened)
+    
+    acc = accuracy_score(test_labels_int, predictions)
+    f1 = f1_score(test_labels_int, predictions, average="weighted")  # "weighted" to account for class imbalance
+    
+    # Print metrics
+    print(f'Test accuracy: {acc*100}%, Test error rate {(1 - acc)*100:.2f}%, F1-score: {f1:2f}, k={k}, row_evs={row_evs}, col_evs={col_evs}')
+    
+    # Confusion matrix
+    cm = confusion_matrix(test_labels_int, predictions)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=np.unique(test_labels_int))
+    disp.plot(cmap=plt.cm.Blues)
+    plt.title(f'Confusion Matrix for a KNN model\nwith 2DSVD used for preprocessing')
+    plt.savefig('figures/confusion_matrix_KNN_2dsvd_best_params.pdf')
+    plt.show()

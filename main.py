@@ -53,14 +53,19 @@ def main():
     # activations_plot(model, test_loader)
 
 def experiment():
+    # kNN
     # max_acc, best_k, best_row_ev, best_col_ev = run_2dsvd()
     # print(f"best val acc: {max_acc}, best_k: {best_k}, best_row_ev: {best_row_ev}, best_col_ev: {best_col_ev}")
-    # best val acc: 0.9666666666666668, best_k: 3, best_row_ev: 5, best_col_ev: 10
+    # best val f1: 0.9662996262996263, best_k: 3, best_row_ev: 5, best_col_ev: 10
     # best_params_2dsvd(3, 5, 10)
-    # Best Validation Accuracy: 98.52%, lr: 0.001, wd: 0.001
-    # Final Test Accuracy: 97.30%
+    # Test accuracy: 96.75675675675676%, Test error rate 3.24%, F1-score: 0.967813, k=3, row_evs=5, col_evs=10
+    
+    # CNN
+    # Best Validation Weigthed F1: 0.98, lr: 0.001, wd: 0.001
+    # Confusion matrix saved to figures/confusion_matrix_CNN_2dsvd.pdf
+    # Final Test Error: 2.43%
     train_CNN(CustomCNN)
 
 if __name__ == "__main__":
     main()
-    experiment()
+    # experiment()

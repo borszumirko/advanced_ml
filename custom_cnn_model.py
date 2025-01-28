@@ -1,8 +1,11 @@
-from read_data import read_data
-import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+import torch.nn as nn
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from sklearn.metrics import confusion_matrix, f1_score
+from read_data import read_data
 
 # Just a skeleton for now
 # Needs testing and proper matching to the data format
@@ -115,6 +118,67 @@ def evaluate_model(model, data_loader, device):
             total += X_batch.size(0)
     acc = 100.0 * correct / total
     return acc
+
+
+def evaluate_model_and_plot_cm(model, data_loader, device, class_names, save_path='confusion_matrix.pdf'):
+    model.eval()
+    all_preds = []
+    all_labels = []
+    
+    with torch.no_grad():
+        for X_batch, y_batch in data_loader:
+            X_batch = X_batch.to(device)
+            y_batch = y_batch.to(device)
+            
+            logits = model(X_batch)
+            _, predicted = torch.max(logits, dim=1)
+            
+            all_preds.extend(predicted.cpu().numpy())
+            all_labels.extend(y_batch.cpu().numpy())
+    
+    # Compute confusion matrix
+    cm = confusion_matrix(all_labels, all_preds)
+    
+    # Plot confusion matrix
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted Label')
+    plt.ylabel('True Label')
+    
+    # Save the plot as a PDF
+    plt.savefig(save_path, format='pdf')
+    plt.close()
+
+    print(f'Confusion matrix saved to {save_path}')
+
+    correct = sum(np.array(all_preds) == np.array(all_labels))
+    total = len(all_labels)
+    acc = 100.0 * correct / total
+    return acc
+
+
+
+def get_f1_score(model, data_loader, device):
+    model.eval()
+    all_preds = []
+    all_labels = []
+    
+    with torch.no_grad():
+        for X_batch, y_batch in data_loader:
+            X_batch = X_batch.to(device)
+            y_batch = y_batch.to(device)
+            
+            logits = model(X_batch)
+            _, predicted = torch.max(logits, dim=1)
+            
+            all_preds.extend(predicted.cpu().numpy())  # Collect predictions
+            all_labels.extend(y_batch.cpu().numpy())  # Collect true labels
+    
+    # Calculate the weighted F1 score
+    weighted_f1 = f1_score(all_labels, all_preds, average='weighted')
+    return weighted_f1
+
 
 
 def get_predictions_and_labels(model, data_loader, device):
