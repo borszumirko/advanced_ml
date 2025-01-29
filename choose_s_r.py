@@ -3,7 +3,7 @@ from read_data import read_data
 from preprocessing import unify_lengths, create_covariance_matrices, compute_eigenvectors, get_eigenvectors
 import matplotlib.pyplot as plt
 
-def sum_square_difference(matrix1, matrix2):
+def elementwise_difference(matrix1, matrix2):
     """
     Calculate the sum of elementwise square differences between two matrices.
     """
@@ -32,7 +32,7 @@ for i in range(1, 12):
         transformed = U.T @ train_extended[j] @ V
         reconstructed = U @ transformed @ V.T
         # Calculate the reconstruction error
-        total_error += sum_square_difference(train_extended[j], reconstructed)
+        total_error += elementwise_difference(train_extended[j], reconstructed)
     print("Row eigenvectors:", i, "Column eigenvectors:", s, "Total error:", total_error)
     sse_s.append(total_error)
 
