@@ -50,6 +50,7 @@ plt.plot(range(1, 12), sse_s)
 plt.xlabel("Number of row eigenvectors")
 plt.ylabel("SSE")
 plt.title("SSE vs number of row eigenvectors")
+plt.savefig("figures/sse_vs_row_evs.pdf")
 plt.show()
 
 

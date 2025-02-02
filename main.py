@@ -1,5 +1,5 @@
 from baseline_model import perform_baseline_model
-from svd_2D import run_2dsvd, best_params_2dsvd
+from svd_2D import run_2dsvd, best_params_2dsvd, knn_hyperparams
 from read_data import read_data
 from plotting import plot_datapoint, plot_multiple_datapoints, heatmap_plot, plot_loss_accuracy, activations_plot
 from custom_cnn_model import CustomCNN, train_model, evaluate_model
@@ -23,7 +23,7 @@ def main():
     print(f'Best k: {best_k}, Validation score: {best_score}, Test score: {test_score}')
 
     ## Perform SVD model
-    run_2dsvd(best_k)
+    # run_2dsvd(best_k)
 
     ## Perform custom CNN model
     X_train = pad_sequences(train_inputs, max_len=30)
@@ -69,3 +69,4 @@ def experiment():
 if __name__ == "__main__":
     main()
     # experiment()
+    # knn_hyperparams()
