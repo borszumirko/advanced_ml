@@ -39,7 +39,7 @@ class CustomCNN(nn.Module):
         x shape: (batch_size, 12, 30)
         """
         x = F.relu(self.bn1(self.conv1(x)))  
-        x = F.relu(self.bn2(self.conv2(x))) 
+        x = F.tanh(self.bn2(self.conv2(x))) 
         
         # Flatten
         x = x.view(x.size(0), -1)   
