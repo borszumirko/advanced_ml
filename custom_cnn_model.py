@@ -209,7 +209,7 @@ def register_activations(model, test_loader):
     single_sample = sample_batch[0:1].to(device)
     single_label = label_batch[0].item()
 
-    # 6) Forward pass
+    # Forward pass
     _ = model(single_sample)
 
     conv1_act = activations['conv1']  # shape: (1, 32, 30)
