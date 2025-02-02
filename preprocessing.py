@@ -2,7 +2,9 @@ from read_data import read_data
 import numpy as np
 
 def set_seq_length(sequence, target):
-
+    '''
+    extend or truncate a sequence to match the target length
+    '''
     if len(sequence) > target:
         return sequence[:target]
     if len(sequence) == target:
@@ -11,7 +13,9 @@ def set_seq_length(sequence, target):
         return extend_sequence(sequence, target)
 
 def extend_sequence(seq, target_length):
-    
+    '''
+    extend a sequence by duplicationg some of the values
+    '''
     current_length = len(seq)
     repeat_indices = np.linspace(0, current_length - 1, target_length, dtype=int)
     extended_sequence = np.array(seq)[repeat_indices]
@@ -22,6 +26,9 @@ def extend_sequence(seq, target_length):
     return extended_sequence
 
 def extend_matrix(matrix, target):
+    '''
+    apply set_seq_length to each row of the matrix
+    '''
     result = np.zeros((12, target))
     for idx, row in enumerate(matrix):
         extended_row = set_seq_length(row, target)
@@ -29,6 +36,9 @@ def extend_matrix(matrix, target):
     return result
 
 def unify_lengths(train, test):
+    '''
+    unify the lengths of the sequences in the train and test sets
+    '''
     train_T = [i.T for i in train]
     test_T = [i.T for i in test]
     max_train = max([len(i[0]) for i in train_T])
@@ -39,6 +49,9 @@ def unify_lengths(train, test):
     return np.array(train_extended), np.array(test_extened), max_train
 
 def create_covariance_matrices(train_inputs, max_train_length):
+    '''
+    calculate the covariance matrices for the rows and columns of the input matrices
+    '''
     mean_matrix = np.mean(train_inputs, axis=0)
     row_cov = np.zeros((max_train_length, max_train_length))
     col_cov = np.zeros((12, 12))
@@ -55,6 +68,9 @@ def create_covariance_matrices(train_inputs, max_train_length):
 
 
 def get_eigenvectors(cov_matrix, n_evs):
+    '''
+    retunr the top n_evs eigenvectors of the covariance matrix
+    '''
     eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
     
     indices = np.argsort(eigenvalues)[::-1]  # [::-1] to reverse
@@ -64,6 +80,9 @@ def get_eigenvectors(cov_matrix, n_evs):
     return top_eigenvectors
     
 def preprocess_data(train_inputs, test_inputs, num_row_evs=5, num_col_evs=10):
+    '''
+    combine the preprocessing steps into a single function
+    '''
     train_extended, test_extended, max_train_length = unify_lengths(train_inputs, test_inputs)
     row_cov, col_cov = create_covariance_matrices(train_extended, max_train_length)
     
@@ -75,10 +94,10 @@ def preprocess_data(train_inputs, test_inputs, num_row_evs=5, num_col_evs=10):
 
     return train_inputs_tranformed, test_inputs_tranformed
 
+def preprocess_part1(train_inputs, test_inputs):
 '''
 Split preprocess into two parts to compute number of eigenvectors in the middle
 '''
-def preprocess_part1(train_inputs, test_inputs):
     train_extended, test_extended, max_train_length = unify_lengths(train_inputs, test_inputs)
 
     row_cov, col_cov = create_covariance_matrices(train_extended, max_train_length)
@@ -86,10 +105,10 @@ def preprocess_part1(train_inputs, test_inputs):
     return train_extended, test_extended, row_cov, col_cov, max_train_length
 
 
+def compute_eigenvectors(covariance_matrix, threshold=0.98):
 '''
 This returns the number of vectors that explains the threshold variance, it is 98% in the paper.
 '''
-def compute_eigenvectors(covariance_matrix, threshold=0.98):
 
     eigenvalues, _ = np.linalg.eigh(covariance_matrix)
 

@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.metrics import f1_score
 
 def extract_features(sequence):
     '''
@@ -55,6 +55,7 @@ def perform_baseline_model():
     test_labels_int  = np.argmax(test_labels, axis=1)  # shape (270,)
 
     feature_matrix = build_feature_matrix(train_inputs)
+    print(f'Feature matrix shape: {feature_matrix.shape}')
     scaler = StandardScaler()
     train_features = scaler.fit_transform(feature_matrix)
 
@@ -84,7 +85,10 @@ def perform_baseline_model():
 
     test_feature_matrix = build_feature_matrix(test_inputs)
     test_features = scaler.transform(test_feature_matrix)
-
+    
+    predictions = best_knn.predict(test_features)
+    f1 = f1_score(test_labels_int, predictions, average='weighted') 
+    print(f'Best model F1 score: {f1}')
     test_score = best_knn.score(test_features, test_labels_int)
     # print(f'Best k: {best_k}, Validation score: {best_score}, Test score: {test_score}')
 

@@ -7,17 +7,15 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, f1_score
 from read_data import read_data
 
-# Just a skeleton for now
-# Needs testing and proper matching to the data format
 
 activations = {}
 
 class CustomCNN(nn.Module):
-    def __init__(self, num_classes=9):
+    def __init__(self, input_channels=12, input_seq_length=30, num_classes=9):
         super(CustomCNN, self).__init__()
         
         self.conv1 = nn.Conv1d(
-            in_channels=12, 
+            in_channels=input_channels, 
             out_channels=32,
             kernel_size=3,
             padding=1
@@ -32,11 +30,12 @@ class CustomCNN(nn.Module):
         )
         self.bn2 = nn.BatchNorm1d(64)
     
-        self.fc = nn.Linear(64 * 30, num_classes)
+        self.fc = nn.Linear(64 * input_seq_length, num_classes)
     
     def forward(self, x):
         """
-        x shape: (batch_size, 12, 30)
+        x shape: (batch_size, input_channels, input_seq_length)
+
         """
         x = F.relu(self.bn1(self.conv1(x)))  
         x = F.tanh(self.bn2(self.conv2(x))) 
@@ -210,7 +209,7 @@ def register_activations(model, test_loader):
     single_sample = sample_batch[0:1].to(device)
     single_label = label_batch[0].item()
 
-    # 6) Forward pass
+    # Forward pass
     _ = model(single_sample)
 
     conv1_act = activations['conv1']  # shape: (1, 32, 30)
